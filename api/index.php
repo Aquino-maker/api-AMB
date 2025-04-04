@@ -18,6 +18,26 @@
             time_response($data,  date('d/m/Y H:i:s'));
             $invalid_Option = true;
             break;
+
+            case 'random';
+            $min = 1;
+            $max = 100;
+
+            if(isset($_GET['min'])){
+                $min = intval($_GET['min']);
+            }
+            
+            if(isset($_GET['max'])){
+                $max = intval($_GET['max']);
+            }
+
+            if($min >= $max){
+                response($data);
+                return;
+            }
+            define_response($data, rand($min, $max));
+            $invalid_Option = true;
+            break;
         }
     
         if(!$invalid_Option){
