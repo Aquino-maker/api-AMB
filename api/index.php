@@ -1,66 +1,59 @@
-<?php 
-    //Preparando a requisição
+<?php
+$data = [];
 
-    $data = [];
-    
-    date_default_timezone_set('America/Sao_Paulo');
-    $invalid_Option = false;
+date_default_timezone_set('America/Sao_Paulo');
+$validOption = false;
 
-    //Requisição
-    if(isset($_GET['option'])){
-        switch($_GET['option']){
-            case 'status';
+// Verifica a opção
+if (isset($_GET['option'])) {
+    switch ($_GET['option']) {
+        case 'status':
             define_response($data, 'API is running OK!');
-            $invalid_Option = true;
+            $validOption = true;
             break;
 
-            case 'time';
-            time_response($data,  date('d/m/Y H:i:s'));
-            $invalid_Option = true;
+        case 'time':
+            define_response($data, date('d.m.Y H:i:s'));
+            $validOption = true;
             break;
 
-            case 'random';
-            $min = 1;
-            $max = 100;
+        case 'random':
+            $min = isset($_GET['min']) ? intval($_GET['min']) : 1;
+            $max = isset($_GET['max']) ? intval($_GET['max']) : 100;
 
-            if(isset($_GET['min'])){
-                $min = intval($_GET['min']);
-            }
-            
-            if(isset($_GET['max'])){
-                $max = intval($_GET['max']);
+            if ($min >= $max) {
+                error_response($data, 'Parâmetros inválidos: min deve ser menor que max.');
             }
 
-            if($min >= $max){
-                response($data);
-                return;
-            }
             define_response($data, rand($min, $max));
-            $invalid_Option = true;
+            $validOption = true;
             break;
-        }
-    
-        if(!$invalid_Option){
-            echo 'Invalid Option';
-        }
     }
 
-    //Resposta
-    response($data);
-
-    function define_response(&$data, $stats){
-       
-        $data['status'] = 'SUCCESS';
-        $data['data'] = $stats;
+    if (!$validOption) {
+        error_response($data, 'Invalid Option', 404);
     }
+} else {
+    error_response($data, 'Parâmetro "option" ausente.', 400);
+}
 
-    function time_response(&$data, $datetime){
-        $data['time'] =  $datetime;
-    }
+response($data);
 
+// Funções
+function define_response(&$data, $result) {
+    $data['status'] = 'SUCCESS';
+    $data['data'] = $result;
+}
 
-    function response($data){
+function error_response(&$data, $message, $status = 400) {
+    $data['status'] = 'ERROR';
+    $data['message'] = $message;
+    response($data, $status);
+}
+
+function response($data, $status = 200) {
     header("Content-Type:application/json");
+    http_response_code($status);
     echo json_encode($data);
-}   
-?>
+    exit;
+}
