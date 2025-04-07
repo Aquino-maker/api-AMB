@@ -93,7 +93,7 @@
 
     if (isset($_GET['action'])) {
         $action = $_GET['action'];
-        $api_url = 'http://localhost/api/api/index.php?option='; // Substitua por o caminho correto para o seu arquivo da API
+        $api_url = 'http://localhost/api-AMB-1/api/index.php?option='; 
 
         $url = $api_url . $action;
         if ($action === 'random' && isset($_GET['min']) && isset($_GET['max'])) {
